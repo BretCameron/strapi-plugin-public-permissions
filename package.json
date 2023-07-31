@@ -1,0 +1,46 @@
+{
+  "name": "strapi-plugin-public-permissions",
+  "version": "0.0.1",
+  "description": "A plugin to automate the creation of public permissions for your chosen content types.",
+  "strapi": {
+    "name": "public-permissions",
+    "description": "A plugin to automate the creation of public permissions for your chosen content types.",
+    "kind": "plugin",
+    "displayName": "Public Permissions"
+  },
+  "dependencies": {
+    "@strapi/design-system": "^1.6.3",
+    "@strapi/helper-plugin": "^4.6.0",
+    "@strapi/icons": "^1.6.3",
+    "prop-types": "^15.7.2",
+    "yup": "1.2.0"
+  },
+  "devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^5.3.4",
+    "styled-components": "^5.3.6"
+  },
+  "peerDependencies": {
+    "@strapi/strapi": "^4.12.0",
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "react-router-dom": "^5.3.4",
+    "styled-components": "^5.3.6"
+  },
+  "author": {
+    "name": "Bret Cameron",
+    "email": "bretcameron@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "Bret Cameron",
+      "email": "bretcameron@gmail.com"
+    }
+  ],
+  "engines": {
+    "node": ">=14.19.1 <=18.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
