@@ -46,7 +46,7 @@ Set rules for _all_ your custom content types (anything in `./src/api/`) by usin
   }
 ```
 
-You can also specify permissions for specific content types, which will override the wildcard rules:
+You can also specify permissions for specific content types, which will override the wildcard rules. Use the `singularName` name for your content type, which is the name of its folder in `./src/api/`, and is usually lower-kebab-case: 
 
 ```json
   {
