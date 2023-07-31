@@ -18,7 +18,7 @@ module.exports = {
     enabled: true,
     resolve: "./src/plugins/public-permissions",
     config: {
-      permissions: {
+      actions: {
         "*": ["find", "findOne"],
       },
     },
@@ -28,13 +28,13 @@ module.exports = {
 
 ### Configuration
 
-You can choose which permissions to apply to which content types by editing the `permissions` object in the plugin config.
+You can choose which permissions to apply to which content types by editing the `actions` object in the plugin config.
 
 Set rules for _all_ your custom content types (anything in `./src/api/`) by using the wildcard `*`:
 
 ```json
   {
-    "permissions": {
+    "actions": {
       "*": ["find", "findOne"],
     }
   }
@@ -44,7 +44,7 @@ You can also specify permissions for specific content types, which will override
 
 ```json
   {
-    "permissions": {
+    "actions": {
       "article": ["find", "findOne", "create", "update", "delete"],
       "category": ["find", "findOne"],
     }
