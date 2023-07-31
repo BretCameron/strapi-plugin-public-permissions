@@ -53,7 +53,13 @@ async function setPublicContentTypes({ actions, verbose }) {
       await trx.select("id").where({ type: "public" }).from(TABLE.roles).first()
     ).id;
 
-    for (const api of customApis) {
+    const apisToDelete = customApis;
+
+    if (actions["*"]) {
+      apisToDelete.push(...publicApis);
+    }
+
+    for (const api of apisToDelete) {
       const apiId = `api::${api}.${api}`;
 
       // delete any existing permissions that start with the api id
