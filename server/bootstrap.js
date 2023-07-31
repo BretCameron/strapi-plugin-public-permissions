@@ -9,13 +9,17 @@ const TABLE = {
 };
 
 async function setPublicContentTypes({ actions, verbose }) {
-  if (verbose) {
-    strapi.log.info(`Setting actions to "public"...`);
+  function log() {
+    if (verbose) {
+      strapi.log.info(...arguments);
+    }
   }
+
+  log(`Setting actions to "public"...`);
 
   const now = new Date();
 
-  // find apis which should have public find & findOne methods by reading the "./src/api" directory
+  // find custom apis which by reading the "./src/api" directory
   const publicApis = fs
     .readdirSync("./src/api")
     .filter((dir) => !dir.startsWith(".") && dir !== "audit-log");
@@ -75,11 +79,10 @@ async function setPublicContentTypes({ actions, verbose }) {
     );
 
     if (permissionsToInsert.length) {
-      if (verbose) {
-        strapi.log.info(
-          `Adding ${permissionsToInsert.length} permissions to table "${TABLE.permissions}"...`
-        );
-      }
+      log(
+        `Adding ${permissionsToInsert.length} permissions to table "${TABLE.permissions}"...`
+      );
+
       await trx
         .insert(
           permissionsToInsert.map((action) => ({
@@ -90,14 +93,10 @@ async function setPublicContentTypes({ actions, verbose }) {
         )
         .into(TABLE.permissions);
     } else {
-      if (verbose) {
-        strapi.log.info(
-          `Table "${TABLE.permissions}" contains all required permissions.`
-        );
-      }
+      log(`Table "${TABLE.permissions}" contains all required permissions.`);
     }
 
-    // now all the correct permissions are in the database, we can fetch their ids to then link them to the "public" role (role_id: 2)
+    // now all the correct permissions are in the database, we can fetch their ids to then link them to the "public" role
     const permissionsToAutomateIds = (
       await trx
         .select("id")
@@ -116,30 +115,23 @@ async function setPublicContentTypes({ actions, verbose }) {
     );
 
     if (permissionLinksToInsert.length) {
-      if (verbose) {
-        strapi.log.info(
-          `Adding ${permissionLinksToInsert.length} links to table "${TABLE.links}"...`
-        );
-      }
+      log(
+        `Adding ${permissionLinksToInsert.length} links to table "${TABLE.links}"...`
+      );
+
       await trx
         .insert(
           permissionLinksToInsert.map((id) => ({
             permission_id: id,
-            role_id: 2,
+            role_id: publicRole,
           }))
         )
         .into(TABLE.links);
     } else {
-      if (verbose) {
-        strapi.log.info(
-          `Table "${TABLE.links}" contains all required permission links.`
-        );
-      }
+      log(`Table "${TABLE.links}" contains all required permission links.`);
     }
 
-    if (verbose) {
-      strapi.log.info(`Finished setting actions to "public".`);
-    }
+    log(`Finished setting actions to "public".`);
   });
 }
 
