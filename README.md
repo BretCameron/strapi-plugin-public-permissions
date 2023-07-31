@@ -18,9 +18,8 @@ Now, in your Strapi project, add the following in `./config/plugins.js`:
 module.exports = {
   "public-permissions": {
     enabled: true,
-    resolve: "./src/plugins/public-permissions",
     config: {
-      verbose: false,
+      verbose: true,
       actions: {
         "*": ["find", "findOne"],
       },
@@ -76,6 +75,8 @@ To see `info` logs from the plugin in your terminal, set `verbose` to `true` in 
     "verbose": true,
   }
 ```
+
+The default value is `false`.
 
 ## License
 
