@@ -10,7 +10,7 @@ const TABLE = {
 
 async function setPublicContentTypes({ actions, verbose }) {
   if (verbose) {
-    strapi.log.info(`Setting "find" and "findOne" actions to "public"...`);
+    strapi.log.info(`Setting actions to "public"...`);
   }
 
   const now = new Date();
@@ -138,9 +138,7 @@ async function setPublicContentTypes({ actions, verbose }) {
     }
 
     if (verbose) {
-      strapi.log.info(
-        `Finished setting "find" and "findOne" actions to "public".`
-      );
+      strapi.log.info(`Finished setting actions to "public".`);
     }
   });
 }
