@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-public-permissions",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A plugin to automate the creation of public permissions for your chosen content types.",
   "strapi": {
     "name": "public-permissions",
