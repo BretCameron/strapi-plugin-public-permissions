@@ -8,6 +8,10 @@ A plugin to automate the creation of public permissions for your chosen content 
 npm i strapi-plugin-public-permissions
 ```
 
+```bash
+yarn add strapi-plugin-public-permissions
+```
+
 ## Usage
 
 In your Strapi project, add the following in `./config/plugins.js`:
