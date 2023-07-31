@@ -8,6 +8,13 @@
     "kind": "plugin",
     "displayName": "Public Permissions"
   },
+  "bugs": {
+    "url": "https://github.com/BretCameron/strapi-plugin-public-permissions/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BretCameron/strapi-plugin-public-permissions.git"
+  },
   "dependencies": {
     "@strapi/design-system": "^1.6.3",
     "@strapi/helper-plugin": "^4.6.0",
