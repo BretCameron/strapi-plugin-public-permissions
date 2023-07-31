@@ -84,7 +84,5 @@ MIT License
 ## Links
 
 - [Strapi website](https://strapi.io/)
-- [Strapi community on Slack](https://slack.strapi.io/)
 - [Strapi news on Twitter](https://twitter.com/strapijs)
 - [Strapi news on Facebook](https://www.facebook.com/Strapi-616063331867161/)
-- [Strapi news on LinkedIn](https://www.linkedin.com/company/strapijs/)
