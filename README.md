@@ -55,6 +55,17 @@ You can also specify permissions for specific content types, which will override
   }
 ```
 
+To remove public permissions for a content type, set the value to an empty array:
+
+```json
+  {
+    "actions": {
+      "*": ["find", "findOne"],
+      "private-content-type": [],
+    }
+  }
+```
+
 ## License
 
 MIT License
