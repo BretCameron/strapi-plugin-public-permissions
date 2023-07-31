@@ -12,9 +12,7 @@ npm i strapi-plugin-public-permissions
 yarn add strapi-plugin-public-permissions
 ```
 
-## Usage
-
-In your Strapi project, add the following in `./config/plugins.js`:
+Now, in your Strapi project, add the following in `./config/plugins.js`:
 
 ```js
 module.exports = {
