@@ -22,6 +22,7 @@ module.exports = {
     enabled: true,
     resolve: "./src/plugins/public-permissions",
     config: {
+      verbose: false,
       actions: {
         "*": ["find", "findOne"],
       },
@@ -31,6 +32,8 @@ module.exports = {
 ```
 
 ### Configuration
+
+### `actions`
 
 You can choose which permissions to apply to which content types by editing the `actions` object in the plugin config.
 
@@ -63,6 +66,16 @@ To remove public permissions for a content type, set the value to an empty array
       "*": ["find", "findOne"],
       "private-content-type": [],
     }
+  }
+```
+
+### `verbose`
+
+To see `info` logs from the plugin in your terminal, set `verbose` to `true` in the plugin config:
+
+```json
+  {
+    "verbose": true,
   }
 ```
 
