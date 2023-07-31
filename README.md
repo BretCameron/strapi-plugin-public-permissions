@@ -1,6 +1,6 @@
 # Strapi Plugin: Public Permissions
 
-<img style="margin-block-end:16px;" width="60px" src="public/logo.png" alt="" />
+<img style="margin-block-start:8px;margin-block-end:12px;" width="120px" src="public/logo.png" alt="" />
 
 A plugin to automate the creation of public permissions for your chosen content types.
 
