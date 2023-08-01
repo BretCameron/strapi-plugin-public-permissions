@@ -1,7 +1,5 @@
 "use strict";
 
-const fs = require("fs");
-
 const TABLE = {
   roles: "up_roles",
   permissions: "up_permissions",
@@ -19,20 +17,17 @@ async function setPublicContentTypes({ actions, verbose }) {
 
   const now = new Date();
 
-  // find custom apis which by reading the "./src/api" directory
-  const publicApis = fs
-    .readdirSync("./src/api")
-    .filter((dir) => !dir.startsWith(".") && dir !== "audit-log");
+  const apiContentTypes = Object.keys(strapi.contentTypes).filter(
+    (contentType) => contentType.startsWith("api")
+  );
 
   // create the permission strings expected in the database
-  let permissionsToAutomate = publicApis.reduce((acc, api) => {
-    const apiId = `api::${api}.${api}`;
-
+  let permissionsToAutomate = apiContentTypes.reduce((acc, api) => {
     const arr = [];
 
     if (actions["*"]) {
       for (const action of actions["*"]) {
-        arr.push(`${apiId}.${action}`);
+        arr.push(`${api}.${action}`);
       }
     }
 
@@ -60,14 +55,12 @@ async function setPublicContentTypes({ actions, verbose }) {
     const apisToDelete = customApis;
 
     if (actions["*"]) {
-      apisToDelete.push(...publicApis);
+      apisToDelete.push(...apiContentTypes);
     }
 
     for (const api of apisToDelete) {
-      const apiId = `api::${api}.${api}`;
-
       // delete any existing permissions that start with the api id
-      await trx(TABLE.permissions).where("action", "like", `${apiId}.%`).del();
+      await trx(TABLE.permissions).where("action", "like", `${api}.%`).del();
     }
 
     const currentPermissions = (
