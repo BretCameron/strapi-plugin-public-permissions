@@ -80,6 +80,19 @@ To see `info` logs from the plugin in your terminal, set `verbose` to `true` in 
 
 The default value is `false`.
 
+### `maxParallelOperations`
+
+To keep the plugin from overloading your database, you can set a limit on the number of parallel operations it will perform. The default value is `8`.
+
+
+```json
+  {
+    "maxParallelOperations": 8,
+  }
+```
+
+Alternatively, if you have a large project and want to speed up the bootstrap process, you could try increasing the limit. You should consider the resources available to your server and database when setting this value.
+
 ## License
 
 MIT License

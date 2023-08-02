@@ -4,6 +4,7 @@ const yup = require("yup");
 
 const schema = yup.object().shape({
   verbose: yup.boolean().default(false),
+  maxParallelOperations: yup.number().default(8),
   actions: yup.lazy((value) => {
     const shape = {};
 
@@ -18,6 +19,7 @@ const schema = yup.object().shape({
 module.exports = {
   default: () => ({
     verbose: false,
+    maxParallelOperations: 8,
     permissions: [{ "*": [] }],
   }),
   validator: async (config) => {
