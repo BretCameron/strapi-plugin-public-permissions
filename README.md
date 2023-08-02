@@ -82,7 +82,7 @@ The default value is `false`.
 
 ### `maxParallelOperations`
 
-To keep the plugin from overloading your database, you can set a limit on the number of parallel operations it will perform. The default value is `8`.
+To keep the plugin from overloading your database, you can set a limit on the number of parallel operations it will perform. The default value is `8`, which should be more than low enough for most projects.
 
 
 ```json
