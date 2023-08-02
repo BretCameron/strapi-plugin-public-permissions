@@ -15,7 +15,7 @@ const TABLE = {
 
 async function setPublicContentTypes({ actions, verbose }) {
   if (isEmpty(actions)) {
-    strapi.log.warn(`No actions found in public-permission plugin config.`);
+    strapi.log.warn(`No actions found in public-permissions plugin config.`);
     return;
   }
 
