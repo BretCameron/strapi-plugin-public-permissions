@@ -1,5 +1,12 @@
 "use strict";
 
+const {
+  createDbOperationsLists,
+  isEmpty,
+  replaceObjectKeyWithApiId,
+  replaceWildcardWithModelNames,
+} = require("./helpers");
+
 const TABLE = {
   roles: "up_roles",
   permissions: "up_permissions",
@@ -7,6 +14,11 @@ const TABLE = {
 };
 
 async function setPublicContentTypes({ actions, verbose }) {
+  if (isEmpty(actions)) {
+    strapi.log.warn(`No actions found in public-permission plugin config.`);
+    return;
+  }
+
   function log() {
     if (verbose) {
       strapi.log.info(...arguments);
@@ -15,113 +27,66 @@ async function setPublicContentTypes({ actions, verbose }) {
 
   log(`Setting actions to "public"...`);
 
-  const now = new Date();
-
-  const apiContentTypes = Object.keys(strapi.contentTypes).filter(
-    (contentType) => contentType.startsWith("api")
+  const configuredActions = Object.entries(
+    replaceObjectKeyWithApiId(replaceWildcardWithModelNames(actions))
   );
 
-  // create the permission strings expected in the database
-  let permissionsToAutomate = apiContentTypes.reduce((acc, api) => {
-    const arr = [];
+  const { toDelete, toInsert } = createDbOperationsLists(configuredActions);
 
-    if (actions["*"]) {
-      for (const action of actions["*"]) {
-        arr.push(`${api}.${action}`);
-      }
-    }
-
-    return [...acc, ...arr];
-  }, []);
-
-  const customApis = Object.keys(actions).filter((action) => action !== "*");
-
-  for (const api of customApis) {
-    const apiId = `api::${api}.${api}`;
-    permissionsToAutomate = permissionsToAutomate.filter(
-      (permission) => !permission.startsWith(apiId)
-    );
-
-    for (const action of actions[api]) {
-      permissionsToAutomate.push(`${apiId}.${action}`);
-    }
-  }
+  console.log({ toDelete, toInsert });
 
   await strapi.db.connection.transaction(async function (trx) {
-    const publicRole = (
-      await trx.select("id").where({ type: "public" }).from(TABLE.roles).first()
-    ).id;
-
-    const apisToDelete = customApis;
-
-    if (actions["*"]) {
-      apisToDelete.push(...apiContentTypes);
-    }
-
-    for (const api of apisToDelete) {
-      // delete any existing permissions that start with the api id
-      await trx(TABLE.permissions).where("action", "like", `${api}.%`).del();
-    }
-
-    const currentPermissions = (
-      await trx.select("action").from(TABLE.permissions)
-    ).map(({ action }) => action);
-
-    const permissionsToInsert = permissionsToAutomate.filter(
-      (action) => !currentPermissions.includes(action)
+    log(
+      `Deleting ${toDelete.length} permissions from table "${TABLE.permissions}"...`
     );
 
-    if (permissionsToInsert.length) {
-      log(
-        `Adding ${permissionsToInsert.length} permissions to table "${TABLE.permissions}"...`
-      );
+    const [publicRole] = await Promise.all([
+      trx.select("id").where({ type: "public" }).from(TABLE.roles).first(),
+      ...toDelete.map((api) =>
+        trx(TABLE.permissions).where("action", "like", `${api}.%`).del()
+      ),
+    ]);
 
-      await trx
-        .insert(
-          permissionsToInsert.map((action) => ({
-            action,
-            created_at: now,
-            updated_at: now,
-          }))
-        )
-        .into(TABLE.permissions);
-    } else {
-      log(`Table "${TABLE.permissions}" contains all required permissions.`);
+    log(
+      `Adding ${toInsert.length} permissions to table "${TABLE.permissions}"...`
+    );
+
+    if (toInsert.length) {
+      const now = new Date();
+      await trx(TABLE.permissions).insert(
+        toInsert.map((action) => ({
+          action,
+          created_at: now,
+          updated_at: now,
+        }))
+      );
     }
 
-    // now all the correct permissions are in the database, we can fetch their ids to then link them to the "public" role
-    const permissionsToAutomateIds = (
-      await trx
-        .select("id")
-        .from(TABLE.permissions)
-        .whereIn("action", permissionsToAutomate)
-    ).map(({ id }) => id);
+    const insertedIds = await trx(TABLE.permissions)
+      .select("id")
+      .whereIn("action", toInsert);
 
-    const currentPermissionLinks = await trx
+    const currentLinks = await trx(TABLE.links)
       .select("*")
-      .from(TABLE.links)
-      .whereIn("permission_id", permissionsToAutomateIds)
-      .andWhere({ role_id: publicRole });
+      .whereIn(
+        "permission_id",
+        insertedIds.map(({ id }) => id)
+      )
+      .andWhere({ role_id: publicRole.id });
 
-    const permissionLinksToInsert = permissionsToAutomateIds.filter(
-      (id) => !currentPermissionLinks.some((link) => link.permission_id === id)
+    const linksToInsert = insertedIds.filter(
+      (id) => !currentLinks.some((link) => link.permission_id === id)
     );
 
-    if (permissionLinksToInsert.length) {
-      log(
-        `Adding ${permissionLinksToInsert.length} links to table "${TABLE.links}"...`
-      );
+    log(`Adding ${linksToInsert.length} links to table "${TABLE.links}"...`);
 
-      await trx
-        .insert(
-          permissionLinksToInsert.map((id) => ({
-            permission_id: id,
-            role_id: publicRole,
-          }))
-        )
-        .into(TABLE.links);
-    } else {
-      log(`Table "${TABLE.links}" contains all required permission links.`);
+    if (linksToInsert.length) {
+      await trx(TABLE.links).insert(
+        linksToInsert.map(({ id }) => ({
+          permission_id: id,
+          role_id: publicRole.id,
+        }))
+      );
     }
 
     log(`Finished setting actions to "public".`);
@@ -131,8 +96,8 @@ async function setPublicContentTypes({ actions, verbose }) {
 module.exports = ({ strapi }) => {
   const plugin = strapi.plugin("public-permissions");
 
-  const verbose = plugin.config("verbose");
-  const actions = plugin.config("actions");
-
-  setPublicContentTypes({ actions, verbose });
+  setPublicContentTypes({
+    actions: plugin.config("actions"),
+    verbose: plugin.config("verbose"),
+  });
 };
