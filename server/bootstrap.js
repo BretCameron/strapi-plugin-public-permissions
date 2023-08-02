@@ -33,8 +33,6 @@ async function setPublicContentTypes({ actions, verbose }) {
 
   const { toDelete, toInsert } = createDbOperationsLists(configuredActions);
 
-  console.log({ toDelete, toInsert });
-
   await strapi.db.connection.transaction(async function (trx) {
     log(
       `Deleting ${toDelete.length} permissions from table "${TABLE.permissions}"...`
