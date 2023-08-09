@@ -2,6 +2,20 @@
   "name": "strapi-plugin-public-permissions",
   "version": "0.0.14",
   "description": "A plugin to automate the creation of public permissions for your chosen content types.",
+  "keywords": [
+    "strapi",
+    "plugin",
+    "public",
+    "permissions",
+    "unauthenticated",
+    "users",
+    "content types",
+    "CRUD",
+    "create",
+    "find",
+    "update",
+    "delete"
+  ],
   "strapi": {
     "name": "public-permissions",
     "description": "A plugin to automate the creation of public permissions for your chosen content types.",
