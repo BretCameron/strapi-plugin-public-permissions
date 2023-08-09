@@ -40,9 +40,7 @@
     "react-dom": "^18.2.0"
   },
   "peerDependencies": {
-    "@strapi/strapi": "4.x",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
+    "@strapi/strapi": "4.x"
   },
   "author": {
     "name": "Bret Cameron",
