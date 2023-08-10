@@ -1,4 +1,4 @@
-import { Strapi } from "@strapi/strapi";
+import type { Strapi } from "@strapi/strapi";
 import {
   createDbOperationsLists,
   isEmpty,
@@ -37,7 +37,7 @@ async function setPublicContentTypes({
   log(`Setting actions to "public"...`);
 
   const configuredActions = Object.entries(
-    replaceObjectKeyWithApiId(replaceWildcardWithModelNames(actions))
+    replaceObjectKeyWithApiId(replaceWildcardWithModelNames(strapi, actions))
   );
 
   const { toDelete, toInsert } = createDbOperationsLists(configuredActions);

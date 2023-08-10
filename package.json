@@ -37,6 +37,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@strapi/strapi": "4.12.4",
     "@strapi/typescript-utils": "^4.6.0",
     "@types/react": "^17.0.53",
     "@types/react-dom": "^18.0.28",
