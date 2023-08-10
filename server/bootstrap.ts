@@ -13,9 +13,15 @@ const TABLE = {
 };
 
 async function setPublicContentTypes({
+  strapi,
   actions = {},
   maxParallelOperations = 8,
   verbose = false,
+}: {
+  strapi: Strapi;
+  actions: Record<string, any>;
+  maxParallelOperations: number;
+  verbose: boolean;
 }) {
   if (isEmpty(actions)) {
     strapi.log.warn(`No actions found in public-permissions plugin config.`);
@@ -117,6 +123,7 @@ export default ({ strapi }: { strapi: Strapi }) => {
   const plugin = strapi.plugin("public-permissions");
 
   setPublicContentTypes({
+    strapi,
     actions: plugin.config("actions"),
     maxParallelOperations: plugin.config("maxParallelOperations"),
     verbose: plugin.config("verbose"),
