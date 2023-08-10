@@ -30,13 +30,30 @@
     "url": "git+https://github.com/BretCameron/strapi-plugin-public-permissions.git"
   },
   "dependencies": {
+    "@strapi/design-system": "^1.6.3",
     "@strapi/helper-plugin": "^4.6.0",
     "@strapi/icons": "^1.6.3",
     "prop-types": "^15.7.2",
     "yup": "^1.2.0"
   },
+  "devDependencies": {
+    "@strapi/typescript-utils": "^4.6.0",
+    "@types/react": "^17.0.53",
+    "@types/react-dom": "^18.0.28",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/styled-components": "^5.1.26",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^5.3.4",
+    "styled-components": "^5.3.6",
+    "typescript": "5.0.4"
+  },
   "peerDependencies": {
-    "@strapi/strapi": "4.x"
+    "@strapi/strapi": "4.x",
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "react-router-dom": "^5.3.4",
+    "styled-components": "^5.3.6"
   },
   "author": {
     "name": "Bret Cameron",
@@ -49,8 +66,14 @@
     }
   ],
   "engines": {
-    "node": ">=14.19.1 <=18.x.x",
+    "node": ">=16.0.0 <=20.x.x",
     "npm": ">=6.0.0"
+  },
+  "scripts": {
+    "develop": "yarn develop:plugin & yarn develop:strapi",
+    "develop:plugin": "tsc -p tsconfig.server.json -w",
+    "develop:strapi": "cd ../../.. && yarn strapi develop --watch-admin",
+    "build": "tsc -p tsconfig.server.json"
   },
   "license": "MIT"
 }

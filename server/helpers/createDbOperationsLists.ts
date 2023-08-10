@@ -1,4 +1,4 @@
-const createDbOperationsLists = (configuredActions) => {
+export const createDbOperationsLists = (configuredActions) => {
   return configuredActions.reduce(
     (acc, [key, value]) => {
       const isEmpty = !value?.length || !value[0];
@@ -24,8 +24,4 @@ const createDbOperationsLists = (configuredActions) => {
       toDelete: [],
     }
   );
-};
-
-module.exports = {
-  createDbOperationsLists,
 };
