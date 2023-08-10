@@ -70,7 +70,9 @@
     "npm": ">=6.0.0"
   },
   "scripts": {
-    "develop": "tsc -p tsconfig.server.json -w & (cd ../../.. && yarn strapi develop --watch-admin)",
+    "develop": "yarn develop:plugin & yarn develop:strapi",
+    "develop:plugin": "tsc -p tsconfig.server.json -w",
+    "develop:strapi": "cd ../../.. && yarn strapi develop --watch-admin",
     "build": "tsc -p tsconfig.server.json"
   },
   "license": "MIT"

@@ -1,4 +1,4 @@
-import yup from "yup";
+import * as yup from "yup";
 
 const schema = yup.object().shape({
   verbose: yup.boolean().default(false),
@@ -15,12 +15,12 @@ const schema = yup.object().shape({
 });
 
 export default {
-  default: () => ({
+  default: {
     verbose: false,
     maxParallelOperations: 8,
-    permissions: [{ "*": [] }],
-  }),
-  validator: async (config) => {
+    permissions: [],
+  },
+  async validator(config) {
     await schema.validate(config);
   },
 };
