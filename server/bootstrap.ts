@@ -1,11 +1,10 @@
-"use strict";
-
-const {
+import { Strapi } from "@strapi/strapi";
+import {
   createDbOperationsLists,
   isEmpty,
   replaceObjectKeyWithApiId,
   replaceWildcardWithModelNames,
-} = require("./helpers");
+} from "./helpers";
 
 const TABLE = {
   roles: "up_roles",
@@ -23,9 +22,9 @@ async function setPublicContentTypes({
     return;
   }
 
-  function log() {
+  function log(...args) {
     if (verbose) {
-      strapi.log.info(...arguments);
+      strapi.log.info(...args);
     }
   }
 
@@ -114,7 +113,7 @@ async function setPublicContentTypes({
   });
 }
 
-module.exports = ({ strapi }) => {
+export default ({ strapi }: { strapi: Strapi }) => {
   const plugin = strapi.plugin("public-permissions");
 
   setPublicContentTypes({

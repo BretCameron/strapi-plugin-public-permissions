@@ -1,4 +1,4 @@
-const replaceWildcardWithModelNames = (actions) => {
+export const replaceWildcardWithModelNames = (actions) => {
   const apiContentTypes = Object.keys(strapi.contentTypes).filter(
     (contentType) => contentType.startsWith("api::")
   );
@@ -18,8 +18,4 @@ const replaceWildcardWithModelNames = (actions) => {
   delete config["*"];
 
   return config;
-};
-
-module.exports = {
-  replaceWildcardWithModelNames,
 };
