@@ -5,6 +5,7 @@ import {
   replaceObjectKeyWithApiId,
   replaceWildcardWithModelNames,
 } from "./helpers";
+import { db } from "./helpers/db";
 
 const TABLE = {
   roles: "up_roles",
@@ -43,38 +44,33 @@ async function setPublicContentTypes({
   const { toDelete, toInsert } = createDbOperationsLists(configuredActions);
 
   await strapi.db.connection.transaction(async function (trx) {
-    const publicRole = await trx
-      .select("id")
-      .where({ type: "public" })
-      .from(TABLE.roles)
-      .first();
+    console.log(await db.getPublicRole(trx));
+    console.log(await db.getPublicPermissions(trx));
+    console.log(await db.getPermissionsLinks(trx));
+
+    const publicRole = await db.getPublicRole(trx);
 
     const chunkSize = maxParallelOperations;
-    const chunks = [];
+    const chunks: string[][] = [];
 
     for (let i = 0; i < toDelete.length; i += chunkSize) {
       chunks.push(toDelete.slice(i, i + chunkSize));
     }
 
-    let idsToDelete = [];
+    let idsToDelete: string[] = [];
 
     for (const chunk of chunks) {
-      idsToDelete.push(
-        (
-          await Promise.all(
-            chunk.map((api) =>
-              trx(TABLE.permissions)
-                .select("id")
-                .where("action", "like", `${api}.%`)
-            )
-          )
+      const ids: { id: string }[][] = await Promise.all(
+        chunk.map((api: string) =>
+          trx(TABLE.permissions)
+            .select("id")
+            .where("action", "like", `${api}.%`)
         )
-          .flat()
-          .map(({ id }) => id)
       );
+      const flattenedIds = ids.flat();
+      const arrayOfIds = flattenedIds.map(({ id }) => id);
+      idsToDelete.push(...arrayOfIds);
     }
-
-    idsToDelete = idsToDelete.flat();
 
     log(
       `Deleting ${idsToDelete.length} permissions from table "${TABLE.permissions}"...`
