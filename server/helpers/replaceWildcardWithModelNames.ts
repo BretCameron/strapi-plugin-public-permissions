@@ -1,4 +1,9 @@
-export const replaceWildcardWithModelNames = (strapi, actions) => {
+import type { Strapi } from "@strapi/strapi";
+
+export const replaceWildcardWithModelNames = (
+  strapi: Strapi,
+  actions: Record<string, string[]>
+): Record<string, string[]> => {
   const apiContentTypes = Object.keys(strapi.contentTypes).filter(
     (contentType) => contentType.startsWith("api::")
   );

@@ -6,12 +6,8 @@ import {
   replaceWildcardWithModelNames,
 } from "./helpers";
 import { db } from "./helpers/db";
-
-const TABLE = {
-  roles: "up_roles",
-  permissions: "up_permissions",
-  links: "up_permissions_role_links",
-};
+import { insertPermissions } from "./helpers/db/insertPermissions";
+import { PluginGetter } from "./types";
 
 async function setPublicContentTypes({
   strapi,
@@ -20,10 +16,10 @@ async function setPublicContentTypes({
   verbose = false,
 }: {
   strapi: Strapi;
-  actions: Record<string, any>;
+  actions: Record<string, string[]>;
   maxParallelOperations: number;
   verbose: boolean;
-}) {
+}): Promise<void> {
   if (isEmpty(actions)) {
     strapi.log.warn(`No actions found in public-permissions plugin config.`);
     return;
@@ -44,10 +40,6 @@ async function setPublicContentTypes({
   const { toDelete, toInsert } = createDbOperationsLists(configuredActions);
 
   await strapi.db.connection.transaction(async function (trx) {
-    console.log(await db.getPublicRole(trx));
-    console.log(await db.getPublicPermissions(trx));
-    console.log(await db.getPermissionsLinks(trx));
-
     const publicRole = await db.getPublicRole(trx);
 
     const chunkSize = maxParallelOperations;
@@ -62,7 +54,7 @@ async function setPublicContentTypes({
     for (const chunk of chunks) {
       const ids: { id: string }[][] = await Promise.all(
         chunk.map((api: string) =>
-          trx(TABLE.permissions)
+          trx(db.TABLE.permissions)
             .select("id")
             .where("action", "like", `${api}.%`)
         )
@@ -73,21 +65,21 @@ async function setPublicContentTypes({
     }
 
     log(
-      `Deleting ${idsToDelete.length} permissions from table "${TABLE.permissions}"...`
+      `Deleting ${idsToDelete.length} permissions from table "${db.TABLE.permissions}"...`
     );
 
     await Promise.all([
-      trx(TABLE.permissions).whereIn("id", idsToDelete).del(),
-      await trx(TABLE.links).whereIn("permission_id", idsToDelete).del(),
+      trx(db.TABLE.permissions).whereIn("id", idsToDelete).del(),
+      await trx(db.TABLE.links).whereIn("permission_id", idsToDelete).del(),
     ]);
 
     log(
-      `Adding ${toInsert.length} permissions to table "${TABLE.permissions}"...`
+      `Adding ${toInsert.length} permissions to table "${db.TABLE.permissions}"...`
     );
 
     if (toInsert.length) {
       const now = new Date();
-      await trx(TABLE.permissions).insert(
+      await trx(db.TABLE.permissions).insert(
         toInsert.map((action) => ({
           action,
           created_at: now,
@@ -96,14 +88,12 @@ async function setPublicContentTypes({
       );
     }
 
-    const insertedIds = await trx(TABLE.permissions)
-      .select("id")
-      .whereIn("action", toInsert);
+    const insertedIds = await insertPermissions(trx, toInsert);
 
-    log(`Adding ${insertedIds.length} links to table "${TABLE.links}"...`);
+    log(`Adding ${insertedIds.length} links to table "${db.TABLE.links}"...`);
 
     if (insertedIds.length) {
-      await trx(TABLE.links).insert(
+      await trx(db.TABLE.links).insert(
         insertedIds.map(({ id }) => ({
           permission_id: id,
           role_id: publicRole.id,
@@ -116,7 +106,7 @@ async function setPublicContentTypes({
 }
 
 export default ({ strapi }: { strapi: Strapi }) => {
-  const plugin = strapi.plugin("public-permissions");
+  const plugin: PluginGetter = strapi.plugin("public-permissions");
 
   setPublicContentTypes({
     strapi,
