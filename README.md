@@ -29,6 +29,8 @@ module.exports = {
         "email.email": ["send"],
         "i18n.locales": ["listLocales"],
         "users-permissions.auth": ["callback", "connect", "register"],
+        "users-permissions.permissions": [],
+        "users-permissions.role": [],
         "users-permissions.user": ["me"],
       },
     },
@@ -104,6 +106,9 @@ To remove all public permissions for a plugin, set the value to an empty array:
     }
   }
 ```
+
+
+If you set one plugin's model to be an empty array, it will remove all permissions for that specific model, but the plugin’s other permissions will be unaffected. For example, if you set the `users-permissions.permissions` plugin to be an empty array, `users-permissions.role` will not be affected as that is a different model.
 
 ### `verbose`
 

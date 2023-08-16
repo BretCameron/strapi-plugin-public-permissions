@@ -31,9 +31,7 @@ async function setPublicContentTypes({
   }
 
   function warn(...args) {
-    if (verbose) {
-      strapi.log.warn(...args);
-    }
+    strapi.log.warn(...args);
   }
 
   if (isEmpty({ ...actions, ...plugins })) {
