@@ -26,8 +26,6 @@ module.exports = {
         "*": ["find", "findOne"],
       },
       plugins: {
-        "email.email": ["send"],
-        "i18n.locales": ["listLocales"],
         "users-permissions.auth": ["callback", "connect", "register"],
         "users-permissions.permissions": [],
         "users-permissions.role": [],
