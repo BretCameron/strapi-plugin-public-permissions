@@ -6,7 +6,16 @@ const schema = yup.object().shape({
   actions: yup.lazy((value) => {
     const shape = {};
 
-    for (const [key] of Object.entries(value)) {
+    for (const [key] of Object.entries(value ?? {})) {
+      shape[key] = yup.array().of(yup.string());
+    }
+
+    return yup.object().shape(shape);
+  }),
+  plugins: yup.lazy((value) => {
+    const shape = {};
+
+    for (const [key] of Object.entries(value ?? {})) {
       shape[key] = yup.array().of(yup.string());
     }
 

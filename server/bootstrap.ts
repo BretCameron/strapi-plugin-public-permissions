@@ -3,32 +3,42 @@ import {
   createDbOperationsLists,
   isEmpty,
   replaceObjectKeyWithApiId,
+  replaceObjectKeyWithPluginId,
   replaceWildcardWithModelNames,
 } from "./helpers";
 import { db } from "./helpers/db";
 import { insertPermissions } from "./helpers/db/insertPermissions";
 import { PluginGetter } from "./types";
+import { getPublicPermissionsByModel } from "./helpers/db/getPublicPermissionsByModel";
 
 async function setPublicContentTypes({
   strapi,
   actions = {},
+  plugins = {},
   maxParallelOperations = 8,
   verbose = false,
 }: {
   strapi: Strapi;
   actions: Record<string, string[]>;
+  plugins: Record<string, string[]>;
   maxParallelOperations: number;
   verbose: boolean;
 }): Promise<void> {
-  if (isEmpty(actions)) {
-    strapi.log.warn(`No actions found in public-permissions plugin config.`);
-    return;
-  }
-
   function log(...args) {
     if (verbose) {
       strapi.log.info(...args);
     }
+  }
+
+  function warn(...args) {
+    if (verbose) {
+      strapi.log.warn(...args);
+    }
+  }
+
+  if (isEmpty({ ...actions, ...plugins })) {
+    warn(`No actions found in public-permissions plugin config.`);
+    return;
   }
 
   log(`Setting actions to "public"...`);
@@ -37,7 +47,14 @@ async function setPublicContentTypes({
     replaceObjectKeyWithApiId(replaceWildcardWithModelNames(strapi, actions))
   );
 
-  const { toDelete, toInsert } = createDbOperationsLists(configuredActions);
+  const configuredPlugins = Object.entries(
+    replaceObjectKeyWithPluginId(plugins)
+  );
+
+  const { toDelete, toInsert } = createDbOperationsLists([
+    ...configuredActions,
+    ...configuredPlugins,
+  ]);
 
   await strapi.db.connection.transaction(async function (trx) {
     const publicRole = await db.getPublicRole(trx);
@@ -49,18 +66,14 @@ async function setPublicContentTypes({
       chunks.push(toDelete.slice(i, i + chunkSize));
     }
 
-    let idsToDelete: string[] = [];
+    let idsToDelete: number[] = [];
 
     for (const chunk of chunks) {
-      const ids: { id: string }[][] = await Promise.all(
-        chunk.map((api: string) =>
-          trx(db.TABLE.permissions)
-            .select("id")
-            .where("action", "like", `${api}.%`)
-        )
+      const permissions = await Promise.all(
+        chunk.map((model: string) => getPublicPermissionsByModel(trx, model))
       );
-      const flattenedIds = ids.flat();
-      const arrayOfIds = flattenedIds.map(({ id }) => id);
+      const flattenedPermissions = permissions.flat();
+      const arrayOfIds = flattenedPermissions.map(({ id }) => id);
       idsToDelete.push(...arrayOfIds);
     }
 
@@ -111,6 +124,7 @@ export default ({ strapi }: { strapi: Strapi }) => {
   setPublicContentTypes({
     strapi,
     actions: plugin.config("actions"),
+    plugins: plugin.config("plugins"),
     maxParallelOperations: plugin.config("maxParallelOperations"),
     verbose: plugin.config("verbose"),
   });

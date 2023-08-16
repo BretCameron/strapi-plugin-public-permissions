@@ -25,6 +25,10 @@ module.exports = {
       actions: {
         "*": ["find", "findOne"],
       },
+      plugins: {
+        "email.email": ["send"],
+        "i18n.locales": ["listLocales"],
+      },
     },
   },
 };
@@ -64,6 +68,25 @@ To remove public permissions for a content type, set the value to an empty array
     "actions": {
       "*": ["find", "findOne"],
       "private-content-type": [],
+    }
+  }
+```
+
+### `Plugins`
+
+Plugins work similarly to actions, except there is no wildcard option.
+
+To add a plugin permission, in the configuration you must specify the full model path, such as `email.email`, `i18n.locales`, `users-permissions.auth`, `users-permissions.role`, and so on. 
+
+Then, as for actions, you can specify an array of permissions to apply to that plugin.
+
+For example:
+
+```json
+  {
+    "plugins": {
+      "email.email": ["send"],
+      "i18n.locales": ["listLocales"],
     }
   }
 ```
