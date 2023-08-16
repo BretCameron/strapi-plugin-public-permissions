@@ -1,6 +1,6 @@
 # Strapi Plugin: Public Permissions
 
-A plugin to automate the creation of public permissions for your chosen content types.
+A plugin to automate the creation of public permissions for your chosen API content types and plugins.
 
 <img style="margin-block-start:8px;margin-block-end:12px;" width="120px" src="public/logo.png" alt="" />
 
@@ -28,6 +28,8 @@ module.exports = {
       plugins: {
         "email.email": ["send"],
         "i18n.locales": ["listLocales"],
+        "users-permissions.auth": ["callback", "connect", "register"],
+        "users-permissions.user": ["me"],
       },
     },
   },
@@ -72,7 +74,7 @@ To remove public permissions for a content type, set the value to an empty array
   }
 ```
 
-### `Plugins`
+### `plugins`
 
 Plugins work similarly to actions, except there is no wildcard option.
 
@@ -87,6 +89,18 @@ For example:
     "plugins": {
       "email.email": ["send"],
       "i18n.locales": ["listLocales"],
+    }
+  }
+```
+
+Note that any permissions not specified in the array for a particular model will be removed. So, in the above example, the `email.email` plugin will only have the `send` permission, and the `i18n.locales` plugin will only have the `listLocales` permission.
+
+To remove all public permissions for a plugin, set the value to an empty array:
+
+```json
+  {
+    "plugins": {
+      "email.email": [],
     }
   }
 ```
