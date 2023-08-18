@@ -5,17 +5,16 @@ import {
   replaceObjectKeyWithApiId,
   replaceObjectKeyWithPluginId,
   replaceWildcardWithModelNames,
+  db,
 } from "./helpers";
-import { db } from "./helpers/db";
-import { insertPermissions } from "./helpers/db/insertPermissions";
 import { PluginGetter } from "./types";
-import { getPublicPermissionsByModel } from "./helpers/db/getPublicPermissionsByModel";
+import { UPPermission } from "./helpers/db/types";
 
 async function setPublicContentTypes({
   strapi,
   actions = {},
   plugins = {},
-  maxParallelOperations = 8,
+  maxParallelOperations,
   verbose = false,
 }: {
   strapi: Strapi;
@@ -34,12 +33,19 @@ async function setPublicContentTypes({
     strapi.log.warn(...args);
   }
 
+  if (typeof maxParallelOperations === "number") {
+    warn(
+      `"maxParallelOperations" configuration option is deprecated. It no longer has any effect.`
+    );
+  }
+
   if (isEmpty({ ...actions, ...plugins })) {
-    warn(`No actions found in public-permissions plugin config.`);
+    warn(`No actions or plugins found in public-permissions plugin config.`);
     return;
   }
 
-  log(`Setting actions to "public"...`);
+  log(`---------------------------------------`);
+  log(`Setting permissions to public...`);
 
   const configuredActions = Object.entries(
     replaceObjectKeyWithApiId(replaceWildcardWithModelNames(strapi, actions))
@@ -56,63 +62,68 @@ async function setPublicContentTypes({
 
   await strapi.db.connection.transaction(async function (trx) {
     const publicRole = await db.getPublicRole(trx);
+    const publicPermissions = await db.getPublicPermissions(trx);
 
-    const chunkSize = maxParallelOperations;
-    const chunks: string[][] = [];
+    const existingPermissions: UPPermission[] = [];
+    const permissionsToDelete: UPPermission[] = [];
+    const permissionsToInsert: string[] = [];
 
-    for (let i = 0; i < toDelete.length; i += chunkSize) {
-      chunks.push(toDelete.slice(i, i + chunkSize));
+    for (const permission of publicPermissions) {
+      if (!permission.action) {
+        continue;
+      }
+
+      const action = permission.action;
+
+      const model = action.match(/([\w-:.]+)\..+$/)?.[1] ?? "";
+
+      const toInsertIncludesAction = toInsert.includes(action);
+      const toDeleteIncludesModel = toDelete.includes(model);
+
+      if (toInsertIncludesAction) {
+        existingPermissions.push(permission);
+      }
+
+      if (!toInsertIncludesAction && toDeleteIncludesModel) {
+        permissionsToDelete.push(permission);
+      }
     }
 
-    let idsToDelete: number[] = [];
-
-    for (const chunk of chunks) {
-      const permissions = await Promise.all(
-        chunk.map((model: string) => getPublicPermissionsByModel(trx, model))
-      );
-      const flattenedPermissions = permissions.flat();
-      const arrayOfIds = flattenedPermissions.map(({ id }) => id);
-      idsToDelete.push(...arrayOfIds);
+    for (const action of toInsert) {
+      if (!existingPermissions.find((p) => p.action === action)) {
+        permissionsToInsert.push(action);
+      }
     }
 
-    log(
-      `Deleting ${idsToDelete.length} permissions from table "${db.TABLE.permissions}"...`
+    await db.deletePermissions(trx, permissionsToDelete);
+
+    log(`Deleted  ${permissionsToDelete.length} old permissions.`);
+
+    const insertedPermissionIds = await db.insertPermissions(
+      trx,
+      permissionsToInsert
     );
 
-    await Promise.all([
-      trx(db.TABLE.permissions).whereIn("id", idsToDelete).del(),
-      await trx(db.TABLE.links).whereIn("permission_id", idsToDelete).del(),
-    ]);
+    log(`Inserted ${insertedPermissionIds.length} new permissions.`);
 
-    log(
-      `Adding ${toInsert.length} permissions to table "${db.TABLE.permissions}"...`
+    const permissionIdsThatNeedLinks = [
+      ...insertedPermissionIds,
+      ...existingPermissions.map(({ id }) => id),
+    ];
+
+    const existingLinks = await db.getPermissionsLinksByPermissionIds(
+      trx,
+      permissionIdsThatNeedLinks
     );
 
-    if (toInsert.length) {
-      const now = new Date();
-      await trx(db.TABLE.permissions).insert(
-        toInsert.map((action) => ({
-          action,
-          created_at: now,
-          updated_at: now,
-        }))
-      );
-    }
+    const linksToInsert = permissionIdsThatNeedLinks.filter(
+      (id) => !existingLinks.find((l) => l.permission_id === id)
+    );
 
-    const insertedIds = await insertPermissions(trx, toInsert);
+    await db.insertPermissionLinks(trx, linksToInsert, publicRole.id);
 
-    log(`Adding ${insertedIds.length} links to table "${db.TABLE.links}"...`);
-
-    if (insertedIds.length) {
-      await trx(db.TABLE.links).insert(
-        insertedIds.map(({ id }) => ({
-          permission_id: id,
-          role_id: publicRole.id,
-        }))
-      );
-    }
-
-    log(`Finished setting actions to "public".`);
+    log(`Finished setting permissions to public!`);
+    log(`---------------------------------------`);
   });
 }
 

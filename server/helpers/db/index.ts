@@ -1,15 +1,11 @@
-import { getPermissionsLinks } from "./getPermissionsLinks";
-import { getPublicPermissions } from "./getPublicPermissions";
-import { getPublicPermissionsByModel } from "./getPublicPermissionsByModel";
-import { getPublicRole } from "./getPublicRole";
-import { insertPermissions } from "./insertPermissions";
-import { TABLE } from "./table";
-
-export const db = {
-  getPermissionsLinks,
-  getPublicPermissions,
-  getPublicPermissionsByModel,
-  getPublicRole,
-  insertPermissions,
-  TABLE,
-};
+export * from "./deletePermissionLinksByPermissions";
+export * from "./deletePermissions";
+export * from "./getPermissionsByActions";
+export * from "./getPermissionsLinks";
+export * from "./getPermissionsLinksByPermissionIds";
+export * from "./getPublicPermissions";
+export * from "./getPublicPermissionsByModel";
+export * from "./getPublicRole";
+export * from "./insertPermissionLinks";
+export * from "./insertPermissions";
+export * from "./table";
