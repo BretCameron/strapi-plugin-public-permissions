@@ -10,10 +10,14 @@ export const insertPermissionLinks = async (
     return Promise.resolve([]);
   }
 
-  return await trx(TABLE.links).insert(
+  await trx(TABLE.links).insert(
     permissionIds.map((id) => ({
       permission_id: id,
       role_id: publicRoleId,
     }))
   );
+
+  return (
+    await trx(TABLE.links).select("id").whereIn("permission_id", permissionIds)
+  ).map(({ id }) => id);
 };

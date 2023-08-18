@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 const schema = yup.object().shape({
   verbose: yup.boolean().default(false),
-  maxParallelOperations: yup.number().default(8),
+  maxParallelOperations: yup.number().optional(),
   actions: yup.lazy((value) => {
     const shape = {};
 
@@ -26,8 +26,8 @@ const schema = yup.object().shape({
 export default {
   default: {
     verbose: false,
-    maxParallelOperations: 8,
-    permissions: [],
+    actions: [],
+    plugins: [],
   },
   async validator(config) {
     await schema.validate(config);

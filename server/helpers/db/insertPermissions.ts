@@ -11,7 +11,6 @@ export const insertPermissions = async (
 
   const now = new Date();
 
-  // TODO this doesn't return every id! -- we need to solve this so the correct links are created
   await trx(TABLE.permissions).insert(
     actions.map((action) => ({
       action,
