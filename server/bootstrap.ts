@@ -122,11 +122,6 @@ async function setPublicContentTypes({
 
     await db.insertPermissionLinks(trx, linksToInsert, publicRole.id);
 
-    console.log(
-      await db.getPublicPermissions(trx),
-      await db.getPermissionsLinks(trx)
-    );
-
     log(`Finished setting permissions to public!`);
     log(`---------------------------------------`);
   });
