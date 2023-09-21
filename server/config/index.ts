@@ -26,8 +26,8 @@ const schema = yup.object().shape({
 export default {
   default: {
     verbose: false,
-    actions: [],
-    plugins: [],
+    actions: {},
+    plugins: {},
   },
   async validator(config) {
     await schema.validate(config);

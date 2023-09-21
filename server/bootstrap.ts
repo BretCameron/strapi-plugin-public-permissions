@@ -62,6 +62,13 @@ async function setPublicContentTypes({
 
   await strapi.db.connection.transaction(async function (trx) {
     const publicRole = await db.getPublicRole(trx);
+
+    if (!publicRole) {
+      throw new Error(
+        `No public role found. Make sure your database is connected correctly and that the "Users & Permissions Plugin" has at least one public role.`
+      );
+    }
+
     const publicPermissions = await db.getPublicPermissions(trx);
 
     const existingPermissions: UPPermission[] = [];
