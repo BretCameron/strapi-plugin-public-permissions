@@ -1,3 +1,4 @@
+export * from "./createPublicRole";
 export * from "./deletePermissionLinksByPermissions";
 export * from "./deletePermissions";
 export * from "./getPermissionsByActions";
@@ -8,4 +9,5 @@ export * from "./getPublicPermissionsByModel";
 export * from "./getPublicRole";
 export * from "./insertPermissionLinks";
 export * from "./insertPermissions";
+export * from "./isV5";
 export * from "./table";
