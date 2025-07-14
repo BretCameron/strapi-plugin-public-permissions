@@ -4,13 +4,14 @@ import { Transaction } from "./types";
 export const insertPermissionLinks = async (
   trx: Transaction,
   permissionIds: number[],
-  publicRoleId: number
+  publicRoleId: number,
+  isV5: boolean
 ): Promise<number[]> => {
   if (!permissionIds.length) {
     return Promise.resolve([]);
   }
 
-  await trx(TABLE.links).insert(
+  await trx(isV5 ? TABLE.linksV5 : TABLE.linksV4).insert(
     permissionIds.map((id) => ({
       permission_id: id,
       role_id: publicRoleId,
@@ -18,6 +19,8 @@ export const insertPermissionLinks = async (
   );
 
   return (
-    await trx(TABLE.links).select("id").whereIn("permission_id", permissionIds)
+    await trx(isV5 ? TABLE.linksV5 : TABLE.linksV4)
+      .select("id")
+      .whereIn("permission_id", permissionIds)
   ).map(({ id }) => id);
 };

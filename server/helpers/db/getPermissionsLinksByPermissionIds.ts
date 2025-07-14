@@ -1,12 +1,13 @@
 import { TABLE } from "./table";
-import { Transaction, UPPermission, UPPermissionsLink } from "./types";
+import { Transaction, UPPermissionsLink } from "./types";
 
 export const getPermissionsLinksByPermissionIds = async (
   trx: Transaction,
-  permissionIds: number[]
+  permissionIds: number[],
+  isV5: boolean
 ): Promise<UPPermissionsLink[]> => {
   return await trx
     .select("*")
-    .from(TABLE.links)
+    .from(isV5 ? TABLE.linksV5 : TABLE.linksV4)
     .whereIn("permission_id", permissionIds);
 };
