@@ -1,7 +1,7 @@
-import type { Strapi } from "@strapi/strapi";
+import type { Core } from "@strapi/strapi";
 
 export const replaceWildcardWithModelNames = (
-  strapi: Strapi,
+  strapi: Core.Strapi,
   actions: Record<string, string[]>
 ): Record<string, string[]> => {
   const apiContentTypes = Object.keys(strapi.contentTypes).filter(
