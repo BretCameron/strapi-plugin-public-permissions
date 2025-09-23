@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-public-permissions",
-  "version": "0.2.3",
+  "version": "1.0.0",
   "description": "A plugin to automate the creation of public permissions for your chosen content types.",
   "keywords": [
     "strapi",
@@ -30,31 +30,24 @@
     "url": "git+https://github.com/BretCameron/strapi-plugin-public-permissions.git"
   },
   "dependencies": {
-    "@strapi/design-system": "^1.6.3",
-    "@strapi/helper-plugin": "^4.6.0",
-    "@strapi/icons": "^1.6.3",
+    "@strapi/design-system": "^2.0.0-rc.29",
+    "@strapi/icons": "^2.0.0-rc.29",
     "prop-types": "^15.7.2",
     "yup": "^1.2.0"
   },
   "devDependencies": {
-    "@strapi/strapi": "4.12.4",
-    "@strapi/typescript-utils": "^4.6.0",
-    "@types/react": "^17.0.53",
-    "@types/react-dom": "^18.0.28",
+    "@strapi/strapi": "^5.0.0",
+    "@strapi/typescript-utils": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
     "@types/react-router-dom": "^5.3.3",
-    "@types/styled-components": "^5.1.26",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^5.3.4",
-    "styled-components": "^5.3.6",
-    "typescript": "5.0.4"
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "@strapi/strapi": "4.x",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0",
-    "react-router-dom": "^5.3.4",
-    "styled-components": "^5.3.6"
+    "@strapi/strapi": "5.x",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0"
   },
   "author": {
     "name": "Bret Cameron",

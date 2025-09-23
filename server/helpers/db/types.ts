@@ -1,6 +1,6 @@
-import type { Strapi } from "@strapi/strapi";
+import type { Core } from "@strapi/strapi";
 
-type Connection = Strapi["db"]["connection"]["transaction"];
+type Connection = Core.Strapi["db"]["connection"]["transaction"];
 
 export type Transaction = Parameters<Parameters<Connection>[0]>[0];
 

@@ -1,4 +1,4 @@
-import type { Strapi } from "@strapi/strapi";
+import type { Core } from "@strapi/strapi";
 import {
   createDbOperationsLists,
   isEmpty,
@@ -16,20 +16,20 @@ export async function setPublicContentTypes({
   maxParallelOperations,
   verbose = false,
 }: {
-  strapi: Strapi;
+  strapi: Core.Strapi;
   actions: Record<string, string[]>;
   plugins: Record<string, string[]>;
   maxParallelOperations: number;
   verbose: boolean;
 }): Promise<void> {
-  function log(...args) {
+  function log(message: string) {
     if (verbose) {
-      strapi.log.info(...args);
+      strapi.log.info(message);
     }
   }
 
-  function warn(...args) {
-    strapi.log.warn(...args);
+  function warn(message: string) {
+    strapi.log.warn(message);
   }
 
   if (typeof maxParallelOperations === "number") {
