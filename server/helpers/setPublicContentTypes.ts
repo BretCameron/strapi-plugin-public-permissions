@@ -71,7 +71,6 @@ export async function setPublicContentTypes({
 
     const publicPermissions = await db.getPublicPermissions(trx);
 
-    // Verificar quais permissões da lista toInsert já existem no banco
     const existingPermissionsToInsert = await db.getPermissionsByActions(
       trx,
       toInsert
@@ -105,7 +104,6 @@ export async function setPublicContentTypes({
       }
     }
 
-    // Filtrar apenas as ações que realmente não existem no banco
     for (const action of toInsert) {
       if (!existingActionSet.has(action)) {
         permissionsToInsert.push(action);
