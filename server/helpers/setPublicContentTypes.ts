@@ -71,6 +71,15 @@ export async function setPublicContentTypes({
 
     const publicPermissions = await db.getPublicPermissions(trx);
 
+    const existingPermissionsToInsert = await db.getPermissionsByActions(
+      trx,
+      toInsert
+    );
+
+    const existingActionSet = new Set(
+      existingPermissionsToInsert.map((p) => p.action)
+    );
+
     const existingPermissions: UPPermission[] = [];
     const permissionsToDelete: UPPermission[] = [];
     const permissionsToInsert: string[] = [];
@@ -97,7 +106,7 @@ export async function setPublicContentTypes({
     }
 
     for (const action of toInsert) {
-      if (!existingPermissions.find((p) => p.action === action)) {
+      if (!existingActionSet.has(action)) {
         permissionsToInsert.push(action);
       }
     }
