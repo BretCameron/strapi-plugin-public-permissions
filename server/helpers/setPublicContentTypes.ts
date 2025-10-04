@@ -75,6 +75,7 @@ export async function setPublicContentTypes({
       trx,
       toInsert
     );
+
     const existingActionSet = new Set(
       existingPermissionsToInsert.map((p) => p.action)
     );
